@@ -1,167 +1,157 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BiArrowBack } from "react-icons/bi";
 import BookingForm from "../components/BookingForm";
 import { bookingAPI } from "../services/api";
 
-interface SlotSelection {
-  startTime: string;
-  endTime: string;
-  price: number;
-  date: string;
-}
-
 const CheckoutPage: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const initialBookingData = location.state || {};
+  const navigate = useNavigate();
+  const bookingData = location.state;
 
-  const [bookingData, setBookingData] = useState({
-    experienceId: initialBookingData.experienceId || "",
-    experienceTitle: initialBookingData.experienceTitle || "",
-    selectedSlot: initialBookingData.selectedSlot as SlotSelection | null || null,
-    quantity: initialBookingData.quantity || 1,
-    pricePerPerson: initialBookingData.pricePerPerson || 0,
-    subtotal: initialBookingData.subtotal || 0,
-    taxes: initialBookingData.taxes || 0,
-    total: initialBookingData.total || 0,
-    customerName: initialBookingData.customerName || "",
-    customerEmail: initialBookingData.customerEmail || "",
-    customerPhone: initialBookingData.customerPhone || "",
-    promoCode: initialBookingData.promoCode || "",
-  });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [formData, setFormData] = useState<any>(null);
 
-  const [loading, setLoading] = useState(false);
+  if (!bookingData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-xl font-medium text-red-600">
+            No booking data found
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="mt-4 px-6 py-2 bg-[#FFD643] rounded-lg"
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const handleConfirm = async () => {
-    if (!bookingData.experienceId || !bookingData.selectedSlot) {
-      alert("Please select a valid experience, date, and time slot.");
-      return;
-    }
-
-    setLoading(true);
+  const handleBookingSubmit = async () => {
+    if (!isFormValid || !formData)
+      return alert("Please fill all fields correctly.");
 
     try {
-      const payload = {
+      setIsProcessing(true);
+
+      const bookingDate = new Date(bookingData.selectedDate);
+      const [startTime, endTime] = bookingData.selectedTime
+        .split(" - ")
+        .map((t: string) => t.trim());
+
+      const bookingPayload = {
         experienceId: bookingData.experienceId,
         customerInfo: {
-          name: bookingData.customerName || "John Doe",
-          email: bookingData.customerEmail || "john@example.com",
-          phone: bookingData.customerPhone || "+919876543210",
+          name: formData.fullName,
+          email: formData.email,
         },
         bookingDetails: {
-          date: bookingData.selectedSlot.date,
-          timeSlot: {
-            startTime: bookingData.selectedSlot.startTime,
-            endTime: bookingData.selectedSlot.endTime,
-          },
+          date: bookingDate.toISOString(),
+          timeSlot: { startTime, endTime },
           numberOfGuests: bookingData.quantity,
         },
-        promoCode: bookingData.promoCode || "",
+        promoCode: formData.promoCode || undefined,
       };
 
-      const response = await bookingAPI.create(payload);
-      const bookingRef = response.data.booking?.bookingReference;
+      console.log("Sending to backend:", bookingPayload);
+      const response = await bookingAPI.create(bookingPayload);
 
-      if (bookingRef) {
-        console.log("✅ Booking created! Reference:", bookingRef);
-        alert(`Booking confirmed! Reference: ${bookingRef}`);
-        // Optionally navigate to confirmation page
-        navigate("/confirmation", { state: { bookingReference: bookingRef } });
-      } else {
-        alert("Booking created but no reference returned. Check backend.");
-      }
+      navigate("/confirmation", {
+        state: {
+          success: true,
+          bookingReference: response.data.data.bookingReference,
+          bookingData: response.data.data,
+        },
+      });
     } catch (error: any) {
-      console.error("❌ Booking failed:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Booking failed. Check console for details.");
+      console.error("Booking Error:", error.response?.data || error.message);
+      navigate("/confirmation", {
+        state: {
+          success: false,
+          error:
+            error.response?.data?.message ||
+            "Booking failed. Please try again.",
+        },
+      });
     } finally {
-      setLoading(false);
+      setIsProcessing(false);
     }
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#F9F9F9] mt-2 pt-1 pb-[5rem] px-4 sm:px-8 md:px-12 lg:px-20 xl:px-[124px]">
+    <div className="w-full min-h-screen bg-[#F9F9F9] pt-4 pb-20 px-4 sm:px-8 md:px-12 lg:px-20 xl:px-[124px]">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 w-[100px] h-[28px] text-[14px] font-medium text-black bg-transparent hover:cursor-pointer"
+        className="flex items-center gap-2 mb-6 text-[14px] font-medium text-black hover:text-[#FFD643] transition-colors"
       >
         <BiArrowBack className="text-xl" />
-        <span className="text-[14px]">Checkout</span>
+        <span>Checkout</span>
       </button>
 
-      {/* Main Content */}
-      <div className="w-full flex flex-col lg:flex-row gap-8 pt-[44px] justify-between">
-        {/* Left: Booking Form */}
-        <BookingForm bookingData={bookingData} setBookingData={setBookingData} />
-
-        {/* Right: Summary */}
+      {/* Checkout Layout */}
+      <div className="flex flex-row-reverse justify-between gap-8 font-inter">
+        {/* Booking Summary */}
         <div className="w-[387px] flex flex-col gap-6 bg-[#EFEFEF] rounded-xl p-6">
-          <div className="w-full flex flex-col gap-3">
-            <div className="flex justify-between gap-[72px]">
-              <span className="font-inter font-normal text-[16px] text-black">Experience</span>
-              <span className="font-inter font-normal text-[16px] text-black line-clamp-1">
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-between gap-20 ">
+              <span>Experience</span>
+              <span className="line-clamp-1">
                 {bookingData.experienceTitle || "N/A"}
               </span>
             </div>
-
             <div className="flex justify-between">
-              <span className="font-inter font-normal text-[16px] text-black">Date</span>
-              <span className="font-inter font-normal text-[16px] text-black">
-                {bookingData.selectedSlot
-                  ? new Date(bookingData.selectedSlot.date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })
-                  : "N/A"}
+              <span>Date</span>
+              <span>
+                {new Date(bookingData.selectedDate).toISOString().split("T")[0]}
               </span>
             </div>
-
             <div className="flex justify-between">
-              <span className="font-inter font-normal text-[16px] text-black">Time</span>
-              <span className="font-inter font-normal text-[16px] text-black">
-                {bookingData.selectedSlot
-                  ? `${bookingData.selectedSlot.startTime} - ${bookingData.selectedSlot.endTime}`
-                  : "N/A"}
-              </span>
+              <span>Time</span>
+              <span>{bookingData.selectedTime.split(" - ")[0]}</span>
             </div>
-
             <div className="flex justify-between">
-              <span className="font-inter font-normal text-[16px] text-black">Qty</span>
-              <span className="font-inter font-normal text-[16px] text-black">{bookingData.quantity}</span>
+              <span>Qty</span>
+              <span>{bookingData.quantity}</span>
             </div>
-
-            {/* Pricing */}
-            <div className="flex justify-between w-full">
-              <span className="font-inter font-normal text-[16px] text-black">Subtotal</span>
-              <span className="font-inter font-normal text-[16px] text-black">₹{bookingData.subtotal}</span>
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>₹{bookingData.total}</span>
             </div>
-
-            <div className="flex justify-between w-full">
-              <span className="font-inter font-normal text-[16px] text-black">Taxes</span>
-              <span className="font-inter font-normal text-[16px] text-black">₹{bookingData.taxes}</span>
+            <div className="flex justify-between">
+              <span>Taxes</span>
+              <span>₹{bookingData.taxes}</span>
             </div>
-
             <div className="w-full h-[1px] bg-[#D9D9D9] my-2"></div>
-
-            <div className="flex justify-between w-full">
-              <span className="font-inter font-medium text-[20px] text-black">Total</span>
-              <span className="font-inter font-medium text-[20px] text-black">₹{bookingData.total}</span>
+            <div className="flex justify-between font-medium text-[20px]">
+              <span>Total</span>
+              <span>₹{bookingData.total}</span>
             </div>
-          </div>
 
-          {/* Confirm Button */}
-          <button
-            onClick={handleConfirm}
-            disabled={loading}
-            className={`w-full h-[44px] py-3 px-5 rounded-[8px] text-white font-inter font-medium text-[16px] transition-colors ${
-              loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#FFD643]"
-            }`}
-          >
-            {loading ? "Processing..." : "Pay and Confirm"}
-          </button>
+            {/* ✅ Moved Submit Button */}
+            <button
+              onClick={handleBookingSubmit}
+              disabled={isProcessing || !isFormValid}
+              className="w-full h-[44px] bg-[#161616] rounded-[8px] text-white text-[16px] font-medium hover:bg-[#FFD643] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            >
+              {isProcessing ? "Processing..." : "Confirm Booking"}
+            </button>
+          </div>
         </div>
+
+        {/* Booking Form */}
+        <BookingForm
+          onBookingSubmit={() => {}}
+          isProcessing={isProcessing}
+          onFormValidChange={(valid, data) => {
+            setIsFormValid(valid);
+            setFormData(data);
+          }}
+        />
       </div>
     </div>
   );

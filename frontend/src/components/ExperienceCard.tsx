@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import type { Experience } from "../types";
+
 
 interface ExperienceCardProps {
   experience: Experience;
