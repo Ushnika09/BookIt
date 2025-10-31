@@ -107,7 +107,7 @@ export const createBooking = async (req, res) => {
       customerInfo: {
         name: customerInfo.name,
         email: customerInfo.email,
-        phone: customerInfo.phone
+        
       },
       bookingDetails: {
         date: bookingDate,
