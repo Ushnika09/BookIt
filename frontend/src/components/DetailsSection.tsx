@@ -19,11 +19,6 @@ interface DetailsSectionProps {
   title: string;
   description: string;
   slots: Slot[];
-  highlights: string[];
-  included: string[];
-  notIncluded: string[];
-  meetingPoint: string;
-  cancellationPolicy: string;
   about: string;
   onSlotSelect: (date: string, startTime: string, endTime: string, price: number) => void;
   selectedDate: string;
@@ -34,11 +29,6 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({
   title,
   description,
   slots,
-  highlights,
-  included,
-  notIncluded,
-  meetingPoint,
-  cancellationPolicy,
   about,
   onSlotSelect,
   selectedDate,

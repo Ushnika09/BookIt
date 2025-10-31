@@ -132,13 +132,13 @@ const CheckoutPage: React.FC = () => {
               <span>₹{bookingData.total}</span>
             </div>
 
-            {/* ✅ Moved Submit Button */}
+            {/*   Submit Button */}
             <button
               onClick={handleBookingSubmit}
               disabled={isProcessing || !isFormValid}
               className="w-full h-[44px] bg-[#161616] rounded-[8px] text-white text-[16px] font-medium hover:bg-[#FFD643] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
-              {isProcessing ? "Processing..." : "Confirm Booking"}
+              {isProcessing ? "Processing..." : "Pay and Confirm"}
             </button>
           </div>
         </div>

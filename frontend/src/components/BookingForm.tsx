@@ -8,12 +8,10 @@ interface BookingFormProps {
     promoCode?: string;
   }) => void;
   isProcessing: boolean;
-  onFormValidChange?: (valid: boolean, data?: any) => void; // 👈 to notify parent when form is valid
+  onFormValidChange?: (valid: boolean, data?: any) => void; 
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({
-  onBookingSubmit,
-  isProcessing,
   onFormValidChange,
 }) => {
   const [fullName, setFullName] = useState("");
@@ -23,12 +21,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [applyingPromo, setApplyingPromo] = useState(false);
   const [promoApplied, setPromoApplied] = useState(false);
 
-  // ✅ Apply promo
+  //  Apply promo
   const handleApplyPromo = async () => {
     if (!promoCode) return alert("Enter a promo code first");
     try {
       setApplyingPromo(true);
-      const response = await promoAPI.validate(promoCode, 1000);
+      const response = await promoAPI.validate(promoCode);
+
       if (response.data.success) {
         alert(`Promo code "${promoCode}" applied!`);
         setPromoApplied(true);

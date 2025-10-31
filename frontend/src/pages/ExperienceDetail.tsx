@@ -278,11 +278,6 @@ const handleConfirm = () => {
         title={experience.title}
         description={experience.description}
         slots={experience.slots}
-        highlights={experience.highlights}
-        included={experience.included}
-        notIncluded={experience.notIncluded}
-        meetingPoint={experience.meetingPoint}
-        cancellationPolicy={experience.cancellationPolicy}
         about={experience.about || ""}
         onSlotSelect={handleSlotSelection}
         selectedDate={bookingSelection.date}
