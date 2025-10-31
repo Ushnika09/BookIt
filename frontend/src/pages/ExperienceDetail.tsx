@@ -145,8 +145,8 @@ const handleConfirm = () => {
     total: total
   };
 
-  // ✅ Log the booking data
-  console.log("✅ Booking Confirmed:", bookingData);
+  //  Log the booking data
+  console.log(" Booking Confirmed:", bookingData);
 
   // Optionally navigate to checkout page
   navigate("/checkout", {
@@ -203,7 +203,7 @@ const handleConfirm = () => {
         {/* Left: Image Frame */}
         <div className="w-[765px] h-[381px] rounded-xl bg-gray-200">
           <img
-            src={experience.images[1]?.url || experience.images[0]?.url}
+            src={experience.images[0]?.url || experience.images[1]?.url}
             alt={experience.title}
             className="w-full h-full object-cover rounded-[12px]"
           />
