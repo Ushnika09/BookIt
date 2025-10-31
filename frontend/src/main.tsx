@@ -1,13 +1,14 @@
 
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import HomePage from './pages/Home.tsx';
-import {SearchProvider} from './context/SearchContext.tsx';
-import ExperienceDetailsPage from './pages/ExperienceDetail.tsx';
-import CheckoutPage from './pages/CheckOutPage.tsx';
-import ResultPage from './pages/ResultPage.tsx';
+import App from './App'
+import HomePage from './pages/Home'
+import { SearchProvider } from './context/SearchContext'
+import ExperienceDetailsPage from './pages/ExperienceDetail'
+import CheckoutPage from './pages/CheckOutPage'
+import ResultPage from './pages/ResultPage'
+import { createBrowserRouter ,RouterProvider} from 'react-router-dom'
+
 
 
 const appRoutes = createBrowserRouter([
