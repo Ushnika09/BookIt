@@ -20,28 +20,26 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// const allowedOrigins = [
-//   "http://localhost:5173",
-//   "https://bookit009.netlify.app"
-// ];
+const allowedOrigins = [
+  "http://localhost:5173",           // local dev
+  "https://bookit009.netlify.app"   // your deployed frontend
+];
 
-// app.use(cors({
-//   origin: function(origin, callback) {
-//     // Allow requests with no origin (like Postman)
-//     if (!origin) return callback(null, true);
-    
-//     if (allowedOrigins.includes(origin)) {
-//       callback(null, true);
-//     } else {
-//       console.log("Blocked by CORS: ", origin);
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-//   credentials: true
-// }));
+app.use(cors({
+  origin: function(origin, callback) {
+    // allow requests with no origin (Postman, curl)
+    if (!origin) return callback(null, true);
 
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log("Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 
-app.use(cors({ origin: "*", credentials: true }));
 
 
 // Logging in development

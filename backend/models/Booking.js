@@ -23,10 +23,6 @@ const bookingSchema = new mongoose.Schema({
       lowercase: true,
       match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
     },
-    phone: {
-      type: String,
-      required: [true, 'Phone number is required']
-    }
   },
   bookingDetails: {
     date: {
