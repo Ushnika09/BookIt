@@ -15,25 +15,31 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB
 connectDB();
 
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const allowedOrigins = [
-  "http://localhost:5173", 
+  "http://localhost:5173",
   "https://bookit009.netlify.app"
 ];
 
 app.use(cors({
   origin: function(origin, callback) {
-    if (!origin) return callback(null, true); 
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log("Blocked by CORS: ", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Logging in development
 if (process.env.NODE_ENV === 'development') {
