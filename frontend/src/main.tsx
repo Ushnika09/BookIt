@@ -1,5 +1,5 @@
 
-import { createRoot } from 'react-dom/client'
+
 import './index.css'
 import App from './App'
 import HomePage from './pages/Home'
@@ -8,6 +8,7 @@ import ExperienceDetailsPage from './pages/ExperienceDetail'
 import CheckoutPage from './pages/CheckOutPage'
 import ResultPage from './pages/ResultPage'
 import { createBrowserRouter ,RouterProvider} from 'react-router-dom'
+import { createRoot } from 'react-dom/client'
 
 
 
