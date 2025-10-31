@@ -14,14 +14,12 @@ A fullstack booking application for **travel experiences** — browse, book, and
 ---
 
 ## 🏗️ Project Structure
-
+```
 bookit/
 ├── frontend/ # React + TypeScript + Tailwind CSS
 ├── backend/ # Node.js + Express + MongoDB
 └── README.md
-
-yaml
-Copy code
+```
 
 ---
 
